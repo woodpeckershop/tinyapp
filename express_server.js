@@ -9,7 +9,6 @@ app.set("view engine", "ejs");
 const urlDatabase = {
   b2xVn2: "http://www.lighthouselabs.ca",
   "9sm5xK": "http://www.google.com",
-
 };
 
 app.get("/urls/new", (req, res) => {
@@ -24,13 +23,13 @@ app.get("/urls", (req, res) => {
 app.get("/urls/:shortURL", (req, res) => {
   const templateVars = {
     shortURL: req.params.shortURL,
-    longURL: urlDatabase[req.params.shortURL],
+    longURL: urlDatabase[req.params.shortURL]
   };
   // console.log(req.params)
   // console.log(req.params.shortURL)
-if(!urlDatabase[req.params.shortURL]){
-  res.send("Not a valid URL!");
-}
+  if (!urlDatabase[req.params.shortURL]) {
+    res.send("Not a valid URL!");
+  }
   res.render("urls_show", templateVars);
 });
 
@@ -41,6 +40,19 @@ app.post("/urls", (req, res) => {
   urlDatabase[shortURL] = req.body.longURL;
   res.redirect(`/urls/${shortURL}`);
 });
+
+app.post("/urls/:shortURL/delete", (req, res) => {
+  const shortURL = req.params.shortURL;
+  delete urlDatabase[shortURL];
+  res.redirect("/urls");
+});
+//Edit a longURL
+app.post("/urls/:shortURL", (req, res) => {
+  const shortURL = req.params.shortURL;
+  urlDatabase[shortURL] = req.body.longURL;
+  res.redirect("/urls");
+});
+
 
 app.get("/u/:shortURL", (req, res) => {
   res.redirect(urlDatabase[req.params.shortURL]);
