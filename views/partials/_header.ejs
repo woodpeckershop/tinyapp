@@ -10,17 +10,17 @@
         <a class="nav-item nav-link" href="/urls/new">Create New URL</a>
        
         <% if (!username){ %>
-        <form method="POST" action="/login">
+        <form method="post" action="/login">
           <input name="username" value="Username">
-          <button type="submit" class="btn btn-success">Submit</button>
+          <button type="submit" class="btn btn-primary">Submit</button>
         </form>
         <%} else {%>
-          <p>Logged In As:<%=username%></p>
           <form method = 'post' action = /logout>
-            <button type = "submit">logout</button>
+            <p class="navbar-brand">Logged In As:<%=username%></p>
+            <button type = "submit" class="btn btn-primary">logout</button>
           </form>
           <%}%>
-          
+
       </div>
     </div>
   </nav>
