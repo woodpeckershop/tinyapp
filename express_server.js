@@ -13,16 +13,28 @@ app.use(morgan("dev"));
 const cookieParser = require("cookie-parser");
 app.use(cookieParser());
 
-//login cookie
+//login
 app.post("/login", (req, res) => {
-  // const username = req.body.username;
-  // res.cookie("username", username);
-  // console.log(req);
-  res.redirect("/urls");
+
+  // const userID = generateRandomString();
+  if (!emailLookup(req.body.email)) {
+    res.status(403);
+    res.send("Email does not exist.");
+  }
+ 
+  for (const id in users){
+    if (req.body.password === users[id].password){
+      res.cookie("user_id", users[id].id);
+      res.redirect("/urls");
+    }
+  }
+  res.status(403);
+  res.send("Password does not match record.");
+
 });
+
 app.post("/logout", (req, res) => {
-  const logout = req.body.logout;
-  res.clearCookie(user);
+  res.clearCookie('user_id');
   res.redirect("/urls");
 });
 
@@ -47,7 +59,6 @@ const users = {
 //the new url page
 app.get("/urls/new", (req, res) => {
   const templateVars = {
-    // username: req.cookies["username"],
     user: users[req.cookies.user_id],
   };
   res.render("urls_new", templateVars);
@@ -57,7 +68,6 @@ app.get("/urls/new", (req, res) => {
 app.get("/urls", (req, res) => {
   const templateVars = {
     urls: urlDatabase,
-    // username: req.cookies["username"],
     user: users[req.cookies.user_id],
   };
   res.render("urls_index", templateVars);
@@ -68,7 +78,6 @@ app.get("/urls/:shortURL", (req, res) => {
   const templateVars = {
     shortURL: req.params.shortURL,
     longURL: urlDatabase[req.params.shortURL],
-    //  username: req.cookies["username"],
     user: users[req.cookies.user_id],
   };
   // console.log(req.params)
@@ -110,12 +119,12 @@ function generateRandomString() {
   return shortURL;
 }
 
-//function: email lookup 
+//function: email lookup
 function emailLookup(email) {
   for (const id in users) {
     if (users[id].email === email) {
-      console.log('matching email: ' + users[id].email)
-      console.log(`matching email: ${users[id].email}`)
+      console.log("matching email: " + users[id].email);
+      console.log(`matching email: ${users[id].email}`);
 
       return true;
     }
@@ -125,30 +134,40 @@ function emailLookup(email) {
 
 //register page
 app.get("/register", (req, res) => {
-  res.render("urls_register");
+  const templateVars = {
+    user: users[req.cookies.user_id],
+  };
+
+  res.render("urls_register", templateVars);
 });
 //registration handler
 app.post("/register", (req, res) => {
   const userID = generateRandomString();
   if (!req.body.email || !req.body.password) {
     res.status(400);
-    res.send('Empty email or password!')
+    res.send("Empty email or password!");
   }
-  if(emailLookup(req.body.email)){
-    res.send('Email already exists.') 
+  if (emailLookup(req.body.email)) {
+    res.send("Email already exists.");
   }
-  console.log(userID);
+  // console.log(userID);
   users[userID] = {
     id: userID,
     email: req.body.email,
     password: req.body.password,
   };
-  console.log(users);
+  // console.log(users);
   res.cookie("user_id", userID);
   res.redirect("/urls");
 });
 
-
+//login page
+app.get("/login", (req, res) => {
+  const templateVars = {
+    user: users[req.cookies.user_id],
+  };
+  res.render("urls_login", templateVars);
+});
 
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);

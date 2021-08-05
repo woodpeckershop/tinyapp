@@ -16,13 +16,14 @@
   </head>
   <body>
     <%- include('partials/_header') %>
+
     <main style="margin: 1em;">
-    <form method="POST" action="/register">
-      <label for='email'>Email:</label>
-      <input type = 'email' name="email" value="xxx@xxx.xxx" id = 'email'>
-      <label for='password'>Password:</label>
-      <input type = 'password' name="password" value="********" id = 'password'>
-      <button type="submit" class="btn btn-primary">Register</button>
+    <form method="POST" action="/login">
+      <label for="email">Email:</label>
+      <input type="email" name="email" value="xxx@xxx.xxx" id="email" />
+      <label for="password">Password:</label>
+      <input type="password" name="password" value="********" id="password" />
+      <button type="submit" class="btn btn-primary">Login</button>
     </form>
     </main>
   </body>
