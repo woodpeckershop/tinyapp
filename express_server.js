@@ -15,33 +15,42 @@ app.use(cookieParser());
 
 //login
 app.post("/login", (req, res) => {
-
   // const userID = generateRandomString();
   if (!emailLookup(req.body.email)) {
     res.status(403);
     return res.send("Email does not exist.");
   }
- 
-  for (const id in users){
-    if (req.body.password === users[id].password){
+
+  for (const id in users) {
+    if (req.body.password === users[id].password) {
       res.cookie("user_id", users[id].id);
       return res.redirect("/urls");
     }
   }
   res.status(403);
   return res.send("Password does not match record.");
-
 });
 
 app.post("/logout", (req, res) => {
-  res.clearCookie('user_id');
+  res.clearCookie("user_id");
   res.redirect("/urls");
 });
 
 const urlDatabase = {
-  b2xVn2: "http://www.lighthouselabs.ca",
-  "9sm5xK": "http://www.google.com",
+  b2xVn2: {
+    longURL: "http://www.lighthouselabs.ca",
+    userID: "Default User",
+  },
+  "9sm5xK": {
+    longURL: "http://www.google.com",
+    userID: "Default User",
+  },
 };
+
+// urlDatabase[shortURL] = {
+//   longURL: req.body.longURL,
+//   userID: users[req.cookies.user_id],
+// };
 
 const users = {
   userRandomID: {
@@ -61,7 +70,11 @@ app.get("/urls/new", (req, res) => {
   const templateVars = {
     user: users[req.cookies.user_id],
   };
-  res.render("urls_new", templateVars);
+  if (users[req.cookies.user_id]) {
+    res.render("urls_new", templateVars);
+  } else {
+    res.redirect("/login");
+  }
 });
 
 //index
@@ -73,27 +86,31 @@ app.get("/urls", (req, res) => {
   res.render("urls_index", templateVars);
 });
 
-//Read -a url, redirects to the single url page or post error
+//single url page
 app.get("/urls/:shortURL", (req, res) => {
   const templateVars = {
     shortURL: req.params.shortURL,
-    longURL: urlDatabase[req.params.shortURL],
+    longURL: urlDatabase[req.params.shortURL].longURL,
     user: users[req.cookies.user_id],
   };
-  // console.log(req.params)
-  // console.log(req.params.shortURL)
+
   if (!urlDatabase[req.params.shortURL]) {
     res.send("Not a valid URL!");
   }
   res.render("urls_show", templateVars);
 });
 
-//Add -use the long url client provided to create a short url, add it to the database and show it in the redirected single url page.
+//use the long url client provided to create a short url, add it to the database and show it in the redirected single url page.
 app.post("/urls", (req, res) => {
-  // console.log(req.body); // Log the POST request body to the console
+  if (!users[req.cookies.user_id]) {
+    return res.send("Not a user, please login.");
+  }
   let shortURL = generateRandomString();
-  // console.log(shortURL);
-  urlDatabase[shortURL] = req.body.longURL;
+  urlDatabase[shortURL] = {
+    longURL: req.body.longURL,
+    userID: users[req.cookies.user_id],
+  };
+  // urlDatabase[shortURL] = req.body.longURL;
   res.redirect(`/urls/${shortURL}`);
 });
 //delete a URL
@@ -105,12 +122,15 @@ app.post("/urls/:shortURL/delete", (req, res) => {
 //Edit a longURL
 app.post("/urls/:shortURL", (req, res) => {
   const shortURL = req.params.shortURL;
-  urlDatabase[shortURL] = req.body.longURL;
+  urlDatabase[shortURL].longURL = req.body.longURL;
   res.redirect("/urls");
 });
 
 app.get("/u/:shortURL", (req, res) => {
-  res.redirect(urlDatabase[req.params.shortURL]);
+  if(!urlDatabase[req.params.shortURL]){
+    return res.send("id does not exist.");
+  }
+  res.redirect(urlDatabase[req.params.shortURL].longURL);
 });
 
 //generate 6 digit string
