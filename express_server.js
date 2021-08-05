@@ -20,17 +20,14 @@ function generateRandomString() {
 }
 
 //function: email lookup
-function emailLookup(email) {
-  for (const id in userDatabase) {
-    if (userDatabase[id].email === email) {
-      console.log("matching email: " + userDatabase[id].email);
-      console.log(`matching email: ${userDatabase[id].email}`);
-
-      return true;
-    }
-  }
-  return false;
-}
+  // function emailLookup(email) {
+  //   for (const id in userDatabase) {
+  //     if (userDatabase[id].email === email) {
+  //       return true;
+  //     }
+  //   }
+  //   return false;
+  // }
 
 function getUserByEmail(email) {
   const users = Object.values(userDatabase);
@@ -187,9 +184,6 @@ app.get("/login", (req, res) => {
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
 });
-
-
-
 
 
 //posts
