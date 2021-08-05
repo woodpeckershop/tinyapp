@@ -19,17 +19,17 @@ app.post("/login", (req, res) => {
   // const userID = generateRandomString();
   if (!emailLookup(req.body.email)) {
     res.status(403);
-    res.send("Email does not exist.");
+    return res.send("Email does not exist.");
   }
  
   for (const id in users){
     if (req.body.password === users[id].password){
       res.cookie("user_id", users[id].id);
-      res.redirect("/urls");
+      return res.redirect("/urls");
     }
   }
   res.status(403);
-  res.send("Password does not match record.");
+  return res.send("Password does not match record.");
 
 });
 
