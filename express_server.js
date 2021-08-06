@@ -239,20 +239,3 @@ app.post("/logout", (req, res) => {
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
 });
-
-// const cookieParser = require('cookie-parser');
-// app.use(cookieParser());
-
-// app.get("/urls.json", (req, res) => {
-//   res.json(urlDatabase);
-// });
-
-//function: email lookup -- not applied
-// function emailLookup(email) {
-//   for (const id in userDatabase) {
-//     if (userDatabase[id].email === email) {
-//       return true;
-//     }
-//   }
-//   return false;
-// }
