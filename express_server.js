@@ -6,21 +6,19 @@ const {
   urlDatabase,
   userDatabase,
 } = require("./helpers.js");
-
+const morgan = require("morgan");
 const bcrypt = require("bcrypt");
 const express = require("express");
-
 const cookieSession = require("cookie-session");
+const methodOverride = require('method-override')
 
 const app = express();
 const PORT = 8080; // default port 8080
 const bodyParser = require("body-parser");
 app.use(bodyParser.urlencoded({ extended: true }));
 app.set("view engine", "ejs");
-
-const morgan = require("morgan");
 app.use(morgan("dev"));
-
+app.use(methodOverride('_method'))
 app.use(
   cookieSession({
     name: "jun21",
@@ -146,7 +144,7 @@ app.post("/urls", (req, res) => {
 });
 
 //delete a URL
-app.post("/urls/:shortURL/delete", (req, res) => {
+app.delete("/urls/:shortURL", (req, res) => {
   const userID = req.session.user_id;
   if (!userID) {
     return res.status(400).send("User not logged in.");
@@ -162,7 +160,7 @@ app.post("/urls/:shortURL/delete", (req, res) => {
 });
 
 //Edit a longURL
-app.post("/urls/:shortURL", (req, res) => {
+app.put("/urls/:shortURL", (req, res) => {
   const userID = req.session.user_id;
   if (!userID) {
     return res.status(400).send("User not logged in.");
