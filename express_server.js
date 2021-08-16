@@ -10,7 +10,7 @@ const morgan = require("morgan");
 const bcrypt = require("bcrypt");
 const express = require("express");
 const cookieSession = require("cookie-session");
-const methodOverride = require('method-override')
+const methodOverride = require("method-override");
 
 const app = express();
 const PORT = 8080; // default port 8080
@@ -18,7 +18,7 @@ const bodyParser = require("body-parser");
 app.use(bodyParser.urlencoded({ extended: true }));
 app.set("view engine", "ejs");
 app.use(morgan("dev"));
-app.use(methodOverride('_method'))
+app.use(methodOverride("_method"));
 app.use(
   cookieSession({
     name: "jun21",
@@ -37,25 +37,27 @@ app.get("/", (req, res) => {
 });
 
 //anyone can use a short url to redirect to a website
+
 app.get("/u/:shortURL", (req, res) => {
   if (!urlDatabase[req.params.shortURL]) {
-    return res.send("id does not exist.");
+    return res.status(404).send("id does not exist.");
   }
+  urlDatabase[req.params.shortURL].timeVisited++;
   res.redirect(urlDatabase[req.params.shortURL].longURL);
 });
 
 //index page
 app.get("/urls", (req, res) => {
-  newUrlDb = getUrlsForUser(req.session.user_id, urlDatabase);
+  const newUrlDb = getUrlsForUser(req.session.user_id, urlDatabase);
 
   const templateVars = {
     urls: newUrlDb,
     user: userDatabase[req.session.user_id],
   };
   if (!req.session.user_id) {
-    return res.send(
-      "User is not logged in. Please <a href='/login'>log in</a>."
-    );
+    return res
+      .status(401)
+      .send("User is not logged in. Please <a href='/login'>log in</a>.");
   }
   res.render("urls_index", templateVars);
 });
@@ -85,7 +87,7 @@ app.get("/urls/:shortURL", (req, res) => {
     return res.send("Not a valid URL!");
   }
 
-  newUrlDb = getUrlsForUser(userID, urlDatabase);
+  const newUrlDb = getUrlsForUser(userID, urlDatabase);
   if (!newUrlDb[shortURL]) {
     return res.status(400).send("User does not own the URL with this ID.");
   }
@@ -132,12 +134,18 @@ app.post("/urls", (req, res) => {
 
   const user = userDatabase[userID];
   if (!user) {
-    return res.status(400).send("id does not exist");
+    return res
+      .status(400)
+      .send("id does not exist. Go to <a href='/register'>register</a>.");
   }
   let shortURL = generateRandomString();
+  let today = new Date();
+  let date = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getUTCDate();
   urlDatabase[shortURL] = {
     longURL: req.body.longURL,
     userID: req.session.user_id,
+    timeVisited: 0,
+    dateCreated: date,
   };
 
   res.redirect(`/urls/${shortURL}`);
@@ -171,7 +179,7 @@ app.put("/urls/:shortURL", (req, res) => {
     return res.status(400).send("id does not exist");
   }
   const shortURL = req.params.shortURL;
-  newUrlDb = getUrlsForUser(userID, urlDatabase);
+  const newUrlDb = getUrlsForUser(userID, urlDatabase);
   if (!newUrlDb[shortURL]) {
     return res.status(400).send("User does not own the URL with this ID.");
   }

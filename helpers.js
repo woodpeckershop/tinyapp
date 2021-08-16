@@ -34,10 +34,14 @@ const urlDatabase = {
   b2xVn2: {
     longURL: "http://www.lighthouselabs.ca",
     userID: "Default User",
+    timeVisited: 0,
+    dateCreated: 'default'
   },
   "9sm5xK": {
     longURL: "http://www.google.com",
     userID: "Default User",
+    timeVisited: 0,
+    dateCreated: 'default'
   },
 };
 
@@ -54,5 +58,10 @@ const userDatabase = {
   },
 };
 
-
-module.exports = { getUserByEmail, generateRandomString, getUrlsForUser, urlDatabase, userDatabase }
+module.exports = {
+  getUserByEmail,
+  generateRandomString,
+  getUrlsForUser,
+  urlDatabase,
+  userDatabase,
+};
